@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="Lupus590.Arma3HtmlToCommandline.Domain.Tests/Lupus590.Arma3HtmlToCommandline.Domain.Tests.csproj" />
   <Project Path="Lupus590.Arma3HtmlToCommandline.Domain/Lupus590.Arma3HtmlToCommandline.Domain.csproj" />
+  <Project Path="Lupus590.Arma3HtmlToCommandline.Worker/Lupus590.Arma3HtmlToCommandline.Worker.csproj" />
 </Solution>
