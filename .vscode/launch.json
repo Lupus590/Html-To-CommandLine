@@ -1,0 +1,18 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "C#: Lupus590.Arma3HtmlToCommandline.Worker",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}\\Lupus590.Arma3HtmlToCommandline.Worker\\Lupus590.Arma3HtmlToCommandline.Worker.csproj",
+            "launchConfigurationId": "TargetFramework=;Lupus590.Arma3HtmlToCommandline.Worker"
+        }
+    ],
+    "env": {
+        "DOTNET_ENVIRONMENT": "Development"
+    }
+}
