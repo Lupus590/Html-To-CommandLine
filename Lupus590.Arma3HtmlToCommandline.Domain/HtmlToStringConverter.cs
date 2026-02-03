@@ -20,14 +20,21 @@ public class HtmlToStringConverter(ILogger<HtmlToStringConverter> logger) : IHtm
 		// or maybe should look at the header metadata?
 		// meta data sounds better
 
+		_logger.LogInformation("Opening {filePath}", Path.GetFullPath(filePath));
+
 		var htmlDoc = new HtmlDocument();
 		htmlDoc.Load(filePath);
+
+		_logger.LogDebug("File oppened successfully, looking for mod list table");
+
 		var modListTable = htmlDoc.DocumentNode
 			.ChildNodes.First(n => n.Name.Equals("html", StringComparison.InvariantCultureIgnoreCase))
 			.ChildNodes.First(n => n.Name.Equals("body", StringComparison.InvariantCultureIgnoreCase))
 			.ChildNodes.Where(n => n.Name.Equals("div", StringComparison.InvariantCultureIgnoreCase))
 				.First(n => n.GetClasses().Select(c => c.ToLowerInvariant()).Contains("mod-list")) // TODO: is there a better way to do this?
 			.ChildNodes.First(n => n.Name.Equals("table", StringComparison.InvariantCultureIgnoreCase));
+
+		_logger.LogDebug("Found modlist table, extracting rows");
 
 		var modListTableRows = modListTable
 			.ChildNodes.Where(n => n.Name.Equals("tr", StringComparison.InvariantCultureIgnoreCase))
@@ -41,7 +48,11 @@ public class HtmlToStringConverter(ILogger<HtmlToStringConverter> logger) : IHtm
 				.First(n => n.Attributes.Select(a => a.Value.ToLowerInvariant()).Contains("DisplayName".ToLowerInvariant())) // TODO: is there a better way to do this?
 				.InnerText;
 			stringBuilder.Append('@').Append(modName).Append(';');
+
+			_logger.LogDebug("Extracted mod {modName}", modName);
 		}
+
+		_logger.LogInformation("Finished");
 
 		return stringBuilder.ToString();
 	}
