@@ -8,14 +8,9 @@ public interface IFileLocator
     IEnumerable<string> FindArmaModlistHtmlFiles();
 }
 
-public class FileLocator : IFileLocator
+public class FileLocator(IFileSystem fileSystem) : IFileLocator
 {
-	private readonly IFileSystem fileSystem;
-
-	public FileLocator(IFileSystem fileSystem)
-	{
-		this.fileSystem = fileSystem;
-	}
+	private readonly IFileSystem fileSystem = fileSystem;
 
 	private bool IsArmaModlist(string filePath)
 	{
