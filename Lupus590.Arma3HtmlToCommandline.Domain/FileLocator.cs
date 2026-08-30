@@ -10,17 +10,17 @@ public interface IFileLocator
 
 public class FileLocator(IFileSystem fileSystem) : IFileLocator
 {
-	private readonly IFileSystem fileSystem = fileSystem;
+	private readonly IFileSystem _fileSystem = fileSystem;
 
 	private bool IsArmaModlist(string filePath)
 	{
-		var extention = fileSystem.Path.GetExtension(filePath);
+		var extention = _fileSystem.Path.GetExtension(filePath);
 		if (!extention.Equals("html", StringComparison.InvariantCultureIgnoreCase))
 		{
 			return false;
 		}
 
-		var htmlText = fileSystem.File.ReadAllText(filePath);
+		var htmlText = _fileSystem.File.ReadAllText(filePath);
 		var htmlDocument = new HtmlDocument();
 		htmlDocument.LoadHtml(htmlText);		
 		
@@ -32,9 +32,9 @@ public class FileLocator(IFileSystem fileSystem) : IFileLocator
 
 	public IEnumerable<string> FindArmaModlistHtmlFiles()
 	{
-		var workingFolder = fileSystem.Directory.GetCurrentDirectory();
+		var workingFolder = _fileSystem.Directory.GetCurrentDirectory();
 
-		var armaModlists = fileSystem.Directory.EnumerateFiles(workingFolder)
+		var armaModlists = _fileSystem.Directory.EnumerateFiles(workingFolder)
 			.Where(IsArmaModlist);
 
 		return armaModlists;
