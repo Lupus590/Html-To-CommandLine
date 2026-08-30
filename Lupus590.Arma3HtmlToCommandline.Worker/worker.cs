@@ -12,8 +12,8 @@ public class Worker(IModListHtmlToServerStringConverter modListHtmlToServerStrin
 
 	protected override Task ExecuteAsync(CancellationToken stoppingToken)
 	{
-		var fileToProcess = _fileLocator.FindArmaModlistHtmlFiles();
-		var commandLine = _modListHtmlToServerStringConverter.Convert(fileToProcess);
+		//var fileToProcess = _fileLocator.FindArmaModlistHtmlFiles();
+		//var commandLine = _modListHtmlToServerStringConverter.Convert(fileToProcess);
 
 		return Task.CompletedTask;
 
