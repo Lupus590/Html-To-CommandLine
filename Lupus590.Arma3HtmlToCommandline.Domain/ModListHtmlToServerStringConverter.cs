@@ -4,28 +4,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Lupus590.Arma3HtmlToCommandline.Domain;
 
-public interface IHtmlToStringConverter
+public interface IModListHtmlToServerStringConverter
 {
-    public string ProcessFile(string filePath);
+    public string Convert(HtmlDocument htmlDoc);
 }
 
-public class HtmlToStringConverter(ILogger<HtmlToStringConverter> logger) : IHtmlToStringConverter
+public class ModListHtmlToServerStringConverter(ILogger<ModListHtmlToServerStringConverter> logger) : IModListHtmlToServerStringConverter
 {
-	private readonly ILogger<HtmlToStringConverter> _logger = logger;
+	private readonly ILogger<ModListHtmlToServerStringConverter> _logger = logger;
 
-	public string ProcessFile(string filePath)
+	public string Convert(HtmlDocument htmlDoc)
 	{
-		// TODO: look at line 3 for commemnt
-		// <!--Created by Arma 3 Launcher: https://arma3.com-->
-		// or maybe should look at the header metadata?
-		// meta data sounds better
-
-		_logger.LogInformation("Opening {filePath}", Path.GetFullPath(filePath));
-
-		var htmlDoc = new HtmlDocument();
-		htmlDoc.Load(filePath);
-
-		_logger.LogDebug("File oppened successfully, looking for mod list table");
+		_logger.LogDebug("Looking for mod list table");
 
 		var modListTable = htmlDoc.DocumentNode
 			.ChildNodes.First(n => n.Name.Equals("html", StringComparison.InvariantCultureIgnoreCase))
@@ -38,14 +28,14 @@ public class HtmlToStringConverter(ILogger<HtmlToStringConverter> logger) : IHtm
 
 		var modListTableRows = modListTable
 			.ChildNodes.Where(n => n.Name.Equals("tr", StringComparison.InvariantCultureIgnoreCase))
-				.Where(n => n.Attributes.Select(a => a.Value.ToLowerInvariant()).Contains("ModContainer".ToLowerInvariant())); // TODO: is there a better way to do this?
+				.Where(n => n.Attributes.Select(a => a.Value?.ToLowerInvariant()).Contains("ModContainer".ToLowerInvariant())); // TODO: is there a better way to do this?
 		
 		var stringBuilder = new StringBuilder();
 		
 		foreach (var modRow in modListTableRows)
 		{
 			var modName = modRow.ChildNodes.Where(n => n.Name.Equals("td", StringComparison.InvariantCultureIgnoreCase))
-				.First(n => n.Attributes.Select(a => a.Value.ToLowerInvariant()).Contains("DisplayName".ToLowerInvariant())) // TODO: is there a better way to do this?
+				.First(n => n.Attributes.Select(a => a.Value?.ToLowerInvariant()).Contains("DisplayName".ToLowerInvariant())) // TODO: is there a better way to do this?
 				.InnerText;
 			stringBuilder.Append('@').Append(modName).Append(';');
 

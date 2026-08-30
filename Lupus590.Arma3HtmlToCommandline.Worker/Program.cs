@@ -7,7 +7,7 @@ using Serilog;
 var host = Host.CreateApplicationBuilder();
 host.Services.AddHostedService<Worker>()
     .AddTransient<IFileLocator, FileLocator>()
-    .AddTransient<IHtmlToStringConverter,HtmlToStringConverter>()
+    .AddTransient<IModListHtmlToServerStringConverter,ModListHtmlToServerStringConverter>()
     .AddSerilog((services, loggerConfiguration) => loggerConfiguration.WriteTo.Console());
 
 await host.Build().RunAsync();
