@@ -16,7 +16,7 @@ public class FileLocatorTests
         var sut = serviceProvider.GetRequiredService<IFileLocator>();
         var result = sut.FindArmaModlistHtmlFiles().ToList();
 
-        result.Count().ShouldBe(1);
+		result.Count.ShouldBe(1);
         result.First().ShouldBe("testModlist.html");
     }
 
