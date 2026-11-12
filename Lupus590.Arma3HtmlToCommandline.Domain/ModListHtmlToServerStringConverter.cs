@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 
@@ -49,12 +50,27 @@ public class ModListHtmlToServerStringConverter(ILogger<ModListHtmlToServerStrin
 
 	private bool IsClientSide(HtmlNode tableRow)
 	{
-		var displayName = GetDisplayName(tableRow);
-		if (displayName == "ACE Loadout Organizer")
+		var clientSideIds = new List<string>()
 		{
-			return true;
+			"3804661268",
+		};
+
+		var url = string.Empty;
+		var tableDatas = tableRow?.SelectNodes("td")?.AsEnumerable() ?? Enumerable.Empty<HtmlNode>();
+		foreach (var tableData in tableDatas)
+		{
+			var anchor = tableData.SelectNodes("a")?.FirstOrDefault();
+			if ( anchor is not null)
+			{
+				url = anchor.InnerText;
+				break;
+			}
 		}
-		return false;
+
+		var regex = new Regex(@"^.*\?id=([0-9]*)$", RegexOptions.None, TimeSpan.FromSeconds(1));
+		var id = regex.Match(url).Groups[1].Value;
+
+		return clientSideIds.Contains(id);
 	}
 
 	private StringBuilder ConvertMods(StringBuilder stringBuilder, HtmlNode? modListTable)
