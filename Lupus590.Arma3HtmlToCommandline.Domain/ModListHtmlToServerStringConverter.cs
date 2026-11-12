@@ -41,10 +41,20 @@ public class ModListHtmlToServerStringConverter(ILogger<ModListHtmlToServerStrin
 			var displayName = GetDisplayName(row);
 			var mappedName = _cdlcMapping[displayName];
 			stringBuilder.Append(mappedName).Append(';');
-			_logger.LogDebug("Extracted CDLC {cdlcName} as {mappedName}", displayName, mappedName);
+			_logger.LogDebug("Extracted CDLC `{cdlcName}` as `{mappedName}`", displayName, mappedName);
 		}
 
 		return stringBuilder;
+	}
+
+	private bool IsClientSide(HtmlNode tableRow)
+	{
+		var displayName = GetDisplayName(tableRow);
+		if (displayName == "ACE Loadout Organizer")
+		{
+			return true;
+		}
+		return false;
 	}
 
 	private StringBuilder ConvertMods(StringBuilder stringBuilder, HtmlNode? modListTable)
@@ -55,8 +65,15 @@ public class ModListHtmlToServerStringConverter(ILogger<ModListHtmlToServerStrin
 		foreach (var row in rows)
 		{
 			var displayName = GetDisplayName(row);
+
+			if (IsClientSide(row))
+			{
+				_logger.LogDebug("Found clientside mod `{modName}`, skipping from commandline", displayName);
+				continue;
+			}
+
 			stringBuilder.Append('@').Append(displayName).Append(';');
-			_logger.LogDebug("Extracted mod {modName}", displayName);
+			_logger.LogDebug("Extracted mod `{modName}`", displayName);
 		}
 		
 		return stringBuilder;
