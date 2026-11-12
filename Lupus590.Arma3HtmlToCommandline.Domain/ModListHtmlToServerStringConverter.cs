@@ -10,21 +10,10 @@ public interface IModListHtmlToServerStringConverter
     public string Convert(HtmlDocument htmlDoc);
 }
 
-public class ModListHtmlToServerStringConverter(ILogger<ModListHtmlToServerStringConverter> logger) : IModListHtmlToServerStringConverter
+public class ModListHtmlToServerStringConverter(ILogger<ModListHtmlToServerStringConverter> logger, IConfig config) : IModListHtmlToServerStringConverter
 {
 	private readonly ILogger<ModListHtmlToServerStringConverter> _logger = logger;
-
-	private static readonly Dictionary<string, string> _cdlcMapping = new() // TODO: mapping file? even if config
-	{
-		{ "S.O.G. Prairie Fire", "vn" },
-		{ "Western Sahara", "ws" },
-		{ "Spearhead 1944", "spe" },
-		{ "Global Mobilization", "gm" },
-		{ "CSLA Iron Curtain", "csla" },
-		{ "Reaction Forces", "rf" },
-		{ "Expeditionary Forces", "EF" },
-	};
-
+	private readonly IConfig _config = config;
 	
 	private static readonly Regex _clientModIdRegex = new(@"^.*\?id=([0-9]*)$", RegexOptions.None, TimeSpan.FromSeconds(1));
 
@@ -43,7 +32,7 @@ public class ModListHtmlToServerStringConverter(ILogger<ModListHtmlToServerStrin
 		foreach (var row in rows)
 		{
 			var displayName = GetDisplayName(row);
-			var mappedName = _cdlcMapping[displayName];
+			var mappedName = _config.CdlcMapping[displayName];
 			stringBuilder.Append(mappedName).Append(';');
 			_logger.LogDebug("Extracted CDLC `{cdlcName}` as `{mappedName}`", displayName, mappedName);
 		}
@@ -51,13 +40,8 @@ public class ModListHtmlToServerStringConverter(ILogger<ModListHtmlToServerStrin
 		return stringBuilder;
 	}
 
-	private static bool IsClientSide(HtmlNode tableRow)
+	private bool IsClientSide(HtmlNode tableRow)
 	{
-		var clientSideIds = new List<string>()
-		{
-			"3804661268",
-		};
-
 		var url = string.Empty;
 		var tableDatas = tableRow?.SelectNodes("td")?.AsEnumerable() ?? Enumerable.Empty<HtmlNode>();
 		foreach (var tableData in tableDatas)
@@ -72,7 +56,7 @@ public class ModListHtmlToServerStringConverter(ILogger<ModListHtmlToServerStrin
 
 		var id = _clientModIdRegex.Match(url).Groups[1].Value;
 
-		return clientSideIds.Contains(id);
+		return _config.ClientSideIds.Contains(id);
 	}
 
 	private StringBuilder ConvertMods(StringBuilder stringBuilder, HtmlNode? modListTable)

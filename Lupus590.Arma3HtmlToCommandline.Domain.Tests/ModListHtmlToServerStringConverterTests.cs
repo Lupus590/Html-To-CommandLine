@@ -25,6 +25,7 @@ public class ModListHtmlToServerStringConverterTests
     {
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddTransient<IModListHtmlToServerStringConverter, ModListHtmlToServerStringConverter>()
+            .AddTransient<IConfig, Config>()
             .AddLogging();
         return serviceCollection.BuildServiceProvider();
     }
