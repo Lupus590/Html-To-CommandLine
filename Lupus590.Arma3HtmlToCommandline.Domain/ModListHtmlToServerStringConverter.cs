@@ -25,6 +25,9 @@ public class ModListHtmlToServerStringConverter(ILogger<ModListHtmlToServerStrin
 		{ "Expeditionary Forces", "EF" },
 	};
 
+	
+	private readonly Regex _clientModIdRegex = new(@"^.*\?id=([0-9]*)$", RegexOptions.None, TimeSpan.FromSeconds(1));
+
 	private static string GetDisplayName(HtmlNode tableRow)
 	{
 		var displayName = tableRow.SelectNodes("td")?.FirstOrDefault(node => node.GetAttributeValue("data-type", string.Empty) == "DisplayName");
@@ -67,8 +70,7 @@ public class ModListHtmlToServerStringConverter(ILogger<ModListHtmlToServerStrin
 			}
 		}
 
-		var regex = new Regex(@"^.*\?id=([0-9]*)$", RegexOptions.None, TimeSpan.FromSeconds(1));
-		var id = regex.Match(url).Groups[1].Value;
+		var id = _clientModIdRegex.Match(url).Groups[1].Value;
 
 		return clientSideIds.Contains(id);
 	}
