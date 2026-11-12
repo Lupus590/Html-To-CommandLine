@@ -11,7 +11,7 @@ public class ModListHtmlToServerStringConverterTests
     {
         var testFilePath = "../../../testModlist.html";
         var testDoc = new HtmlDocument();
-		testDoc.LoadHtml(testFilePath);
+		testDoc.Load(testFilePath);
         
         var serviceProvider = GetServiceProvider();
         
