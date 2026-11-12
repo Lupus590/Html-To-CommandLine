@@ -18,7 +18,7 @@ public class ModListHtmlToServerStringConverterTests
         var sut = serviceProvider.GetRequiredService<IModListHtmlToServerStringConverter>();
         var result = sut.Convert(testDoc);
 
-        result.ShouldBe("@CBA_A3;@Speshal Core;@Animate - Rewrite;@ace;");
+        result.ShouldBe("EF;rf;@CBA_A3;@Speshal Core;@Animate - Rewrite;@ace;");
     }
 
     private static ServiceProvider GetServiceProvider()
