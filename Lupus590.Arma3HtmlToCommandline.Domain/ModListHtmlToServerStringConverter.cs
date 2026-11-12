@@ -13,6 +13,17 @@ public class ModListHtmlToServerStringConverter(ILogger<ModListHtmlToServerStrin
 {
 	private readonly ILogger<ModListHtmlToServerStringConverter> _logger = logger;
 
+	private readonly Dictionary<string, string> _cdlcMapping = new()
+	{
+		{ "S.O.G. Prairie Fire", "vn" },
+		{ "Western Sahara", "ws" },
+		{ "Spearhead 1944", "spe" },
+		{ "Global Mobilization", "gm" },
+		{ "CSLA Iron Curtain", "csla" },
+		{ "Reaction Forces", "rf" },
+		{ "Expeditionary Forces", "EF" },
+	};
+
 	private static string GetDisplayName(HtmlNode tableRow)
 	{
 		var displayName = tableRow.SelectNodes("td")?.FirstOrDefault(node => node.GetAttributeValue("data-type", string.Empty) == "DisplayName");
@@ -23,6 +34,15 @@ public class ModListHtmlToServerStringConverter(ILogger<ModListHtmlToServerStrin
 	private StringBuilder ConvertDlc(StringBuilder stringBuilder, HtmlNode? dlcListTable)
 	{
 		_logger.LogDebug("Found CDLC list table, extracting rows");
+
+		var rows = dlcListTable?.SelectNodes("tr")?.AsEnumerable() ?? Enumerable.Empty<HtmlNode>();
+		foreach (var row in rows)
+		{
+			var displayName = GetDisplayName(row);
+			var mappedName = _cdlcMapping[displayName];
+			stringBuilder.Append(mappedName).Append(';');
+			_logger.LogDebug("Extracted CDLC {cdlcName} as {mappedName}", displayName, mappedName);
+		}
 
 		return stringBuilder;
 	}
