@@ -14,7 +14,7 @@ public class ModListHtmlToServerStringConverter(ILogger<ModListHtmlToServerStrin
 {
 	private readonly ILogger<ModListHtmlToServerStringConverter> _logger = logger;
 
-	private readonly Dictionary<string, string> _cdlcMapping = new()
+	private static readonly Dictionary<string, string> _cdlcMapping = new() // TODO: mapping file? even if config
 	{
 		{ "S.O.G. Prairie Fire", "vn" },
 		{ "Western Sahara", "ws" },
@@ -26,7 +26,7 @@ public class ModListHtmlToServerStringConverter(ILogger<ModListHtmlToServerStrin
 	};
 
 	
-	private readonly Regex _clientModIdRegex = new(@"^.*\?id=([0-9]*)$", RegexOptions.None, TimeSpan.FromSeconds(1));
+	private static readonly Regex _clientModIdRegex = new(@"^.*\?id=([0-9]*)$", RegexOptions.None, TimeSpan.FromSeconds(1));
 
 	private static string GetDisplayName(HtmlNode tableRow)
 	{
@@ -51,7 +51,7 @@ public class ModListHtmlToServerStringConverter(ILogger<ModListHtmlToServerStrin
 		return stringBuilder;
 	}
 
-	private bool IsClientSide(HtmlNode tableRow)
+	private static bool IsClientSide(HtmlNode tableRow)
 	{
 		var clientSideIds = new List<string>()
 		{
