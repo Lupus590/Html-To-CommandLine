@@ -15,19 +15,22 @@ public class FileLocator(IFileSystem fileSystem) : IFileLocator
 	private bool IsArmaModlist(string filePath)
 	{
 		var extention = _fileSystem.Path.GetExtension(filePath);
-		if (!extention.Equals("html", StringComparison.InvariantCultureIgnoreCase))
+		if (!extention.Equals(".html", StringComparison.InvariantCultureIgnoreCase))
 		{
 			return false;
 		}
 
 		var htmlText = _fileSystem.File.ReadAllText(filePath);
 		var htmlDocument = new HtmlDocument();
-		htmlDocument.LoadHtml(htmlText);		
+		htmlDocument.LoadHtml(htmlText);
 		
-		var generator = htmlDocument?.DocumentNode.SelectNodes("meta")
-			?.FirstOrDefault(t => t.Attributes["name"]?.Value == "generator");
+		var html = htmlDocument?.DocumentNode.SelectNodes("html")?.FirstOrDefault();
+		var head = html?.SelectNodes("head")?.FirstOrDefault();
+		var meta = head?.SelectNodes("meta");
+		var generator = meta?.FirstOrDefault(node => node.GetAttributeValue("name", string.Empty) == "generator");
+		var result = generator?.GetAttributeValue("content", string.Empty) == "Arma 3 Launcher - https://arma3.com";
 
-		return generator?.Attributes["content"]?.Value == "Arma 3 Launcher - https://arma3.com";
+		return result;
 	}
 
 	public IEnumerable<string> FindArmaModlistHtmlFiles()

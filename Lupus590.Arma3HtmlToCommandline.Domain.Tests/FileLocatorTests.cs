@@ -20,14 +20,14 @@ public class FileLocatorTests
         var result = sut.FindArmaModlistHtmlFiles().ToList();
 
 		result.Count.ShouldBe(1);
-        result.First().ShouldBe("testModlist.html");
+        Path.GetFileName(result.First()).ShouldBe("testModlist.html");
     }
 
     private static ServiceProvider GetServiceProvider()
     {
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddTransient<IFileLocator, FileLocator>()
-            .AddTransient<IFileSystem, MockFileSystem>()
+            .AddSingleton<IFileSystem, MockFileSystem>()
             .AddLogging();
         return serviceCollection.BuildServiceProvider();
     }
