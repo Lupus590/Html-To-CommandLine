@@ -13,37 +13,54 @@ public class ModListHtmlToServerStringConverter(ILogger<ModListHtmlToServerStrin
 {
 	private readonly ILogger<ModListHtmlToServerStringConverter> _logger = logger;
 
-	public string Convert(HtmlDocument htmlDoc)
+	private static string GetDisplayName(HtmlNode tableRow)
+	{
+		var displayName = tableRow.SelectNodes("td")?.FirstOrDefault(node => node.GetAttributeValue("data-type", string.Empty) == "DisplayName");
+
+		return displayName?.InnerText ?? string.Empty;
+	}
+
+	private StringBuilder ConvertDlc(StringBuilder stringBuilder, HtmlNode? dlcListTable)
+	{
+		_logger.LogDebug("Found CDLC list table, extracting rows");
+
+		return stringBuilder;
+	}
+
+	private StringBuilder ConvertMods(StringBuilder stringBuilder, HtmlNode? modListTable)
+	{
+		_logger.LogDebug("Found modlist table, extracting rows");
+
+		var rows = modListTable?.SelectNodes("tr")?.AsEnumerable() ?? Enumerable.Empty<HtmlNode>();
+		foreach (var row in rows)
+		{
+			var displayName = GetDisplayName(row);
+			stringBuilder.Append('@').Append(displayName).Append(';');
+			_logger.LogDebug("Extracted mod {modName}", displayName);
+		}
+		
+		return stringBuilder;
+	}
+
+	public string Convert(HtmlDocument htmlDocument)
 	{
 		_logger.LogDebug("Looking for mod list table");
 
-		var modListTable = htmlDoc.DocumentNode
-			.ChildNodes.First(n => n.Name.Equals("html", StringComparison.InvariantCultureIgnoreCase))
-			.ChildNodes.First(n => n.Name.Equals("body", StringComparison.InvariantCultureIgnoreCase))
-			.ChildNodes.Where(n => n.Name.Equals("div", StringComparison.InvariantCultureIgnoreCase))
-				.First(n => n.GetClasses().Select(c => c.ToLowerInvariant()).Contains("mod-list")) // TODO: is there a better way to do this?
-			.ChildNodes.First(n => n.Name.Equals("table", StringComparison.InvariantCultureIgnoreCase));
-
-		_logger.LogDebug("Found modlist table, extracting rows");
-
-		var modListTableRows = modListTable
-			.ChildNodes.Where(n => n.Name.Equals("tr", StringComparison.InvariantCultureIgnoreCase))
-				.Where(n => n.Attributes.Select(a => a.Value?.ToLowerInvariant()).Contains("ModContainer".ToLowerInvariant())); // TODO: is there a better way to do this?
-		
+		var html = htmlDocument?.DocumentNode.SelectNodes("html")?.FirstOrDefault();
+		var body = html?.SelectNodes("body")?.FirstOrDefault();
+		var divs = body?.SelectNodes("div");
 		var stringBuilder = new StringBuilder();
-		
-		foreach (var modRow in modListTableRows)
-		{
-			var modName = modRow.ChildNodes.Where(n => n.Name.Equals("td", StringComparison.InvariantCultureIgnoreCase))
-				.First(n => n.Attributes.Select(a => a.Value?.ToLowerInvariant()).Contains("DisplayName".ToLowerInvariant())) // TODO: is there a better way to do this?
-				.InnerText;
-			stringBuilder.Append('@').Append(modName).Append(';');
 
-			_logger.LogDebug("Extracted mod {modName}", modName);
-		}
+		var dlcListDiv = divs?.FirstOrDefault(node => node.GetAttributeValue("class", string.Empty) == "dlc-list");
+		var dlcListTable = dlcListDiv?.SelectNodes("table")?.FirstOrDefault();
+		stringBuilder = ConvertDlc(stringBuilder, dlcListTable);
+
+		var modListDiv = divs?.FirstOrDefault(node => node.GetAttributeValue("class", string.Empty) == "mod-list");
+		var modListTable = modListDiv?.SelectNodes("table")?.FirstOrDefault();
+		stringBuilder = ConvertMods(stringBuilder, modListTable);
 
 		_logger.LogInformation("Finished");
-
+		
 		return stringBuilder.ToString();
 	}
 }
