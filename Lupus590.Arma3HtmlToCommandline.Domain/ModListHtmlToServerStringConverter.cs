@@ -34,7 +34,7 @@ public class ModListHtmlToServerStringConverter(ILogger<ModListHtmlToServerStrin
 			var displayName = GetDisplayName(row);
 			var mappedName = _config.CdlcMapping[displayName];
 			stringBuilder.Append(mappedName).Append(';');
-			_logger.LogDebug("Extracted CDLC `{cdlcName}` as `{mappedName}`", displayName, mappedName);
+			_logger.LogDebug("Found CDLC `{cdlcName}`, adding as `{mappedName}`", displayName, mappedName);
 		}
 
 		return stringBuilder;
@@ -75,7 +75,7 @@ public class ModListHtmlToServerStringConverter(ILogger<ModListHtmlToServerStrin
 			}
 
 			stringBuilder.Append('@').Append(displayName).Append(';');
-			_logger.LogDebug("Extracted mod `{modName}`", displayName);
+			_logger.LogDebug("Found mod `{modName}`", displayName);
 		}
 		
 		return stringBuilder;
